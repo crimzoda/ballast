@@ -23,6 +23,7 @@ it would be useful to just have it as property anyway*/
 Console.WriteLine("AppId: " + item.appid);
 Console.WriteLine("Name: " + item.name);
 Console.WriteLine("Description: " + item.description);
+Console.WriteLine("Rating: " + item.rating);
 /*right now this returns the final discounted price
 future versions will have both discounted and base price*/
 Console.WriteLine("Price: " + item.price);
