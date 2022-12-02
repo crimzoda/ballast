@@ -1,9 +1,6 @@
 # ballast
-A sleek library for retrieving data from online video game stores.
+A library for retrieving data from the Steam store.
 Made with C#, a dependency being HTMLAgilityPack.
-
-Currently only Steam is supported but there is work being done to implement
-itch.io.
 
 Library functionality:
   - Retrieve name
