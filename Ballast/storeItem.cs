@@ -11,9 +11,9 @@ namespace Ballast
 {
 	public class storeItem
 	{
-		public string appid { get; protected set; } /*no need to auto-initialize appid since
-													it will be overwritten with whatever is 
-													inputted even if it's blank*/
+		/*no need to auto-initialize 'appid' as it will be overwritten
+		by the input regardless of the input being invalid or empty*/
+		public string appid { get; protected set; }
 		public string name { get; protected set; } = "unknown"; //auto-initialize in case of exception
 		public string description { get; protected set; } = "unknown";
 		public List<string> developers { get; protected set; } = new List<string> { "unknown" };
