@@ -11,29 +11,38 @@ namespace Ballast
 {
 	public class storeItem
 	{
-		public string appid { get; protected set; }
-		public string name { get; protected set; }
-		public string description { get; protected set; }
-		public List<string> developers { get; protected set; }
-		public int rating { get; protected set; }
-		public string price { get; protected set; }
-		public string imageURL { get; protected set; }
-		public string iconURL { get; protected set; }
-		public List<string> tags { get; protected set; }
+		public string appid { get; protected set; } /*no need to auto-initialize appid since
+													it will be overwritten with whatever is 
+													inputted even if it's blank*/
+		public string name { get; protected set; } = "unknown"; //auto-initialize in case of exception
+		public string description { get; protected set; } = "unknown";
+		public List<string> developers { get; protected set; } = new List<string> { "unknown" };
+		public int rating { get; protected set; } = 0;
+		public string price { get; protected set; } = "unknown";
+		public string imageURL { get; protected set; } = "unknown";
+		public string iconURL { get; protected set; } = "unknown";
+		public List<string> tags { get; protected set; } = new List<string> { "unknown" };
 
 		//constructor will set all the store item properties
 		public storeItem(string id)
 		{
-			HtmlDocument steamDocument = new HtmlWeb().Load("http://store.steampowered.com/app/" + id);
-			appid = id;
-			name = getName(steamDocument);
-			description = getDescription(steamDocument);
-			developers = getDevelopers(steamDocument);
-			rating = getRating(steamDocument);
-			price = getPrice(steamDocument);
-			tags = getTags(steamDocument);
-			imageURL = "http://cdn.akamai.steamstatic.com/steam/apps/" + id + "/header.jpg";
-			iconURL = getIcon(steamDocument);
+			try
+			{
+				HtmlDocument steamDocument = new HtmlWeb().Load("http://store.steampowered.com/app/" + id);
+				appid = id;
+				name = getName(steamDocument);
+				description = getDescription(steamDocument);
+				developers = getDevelopers(steamDocument);
+				rating = getRating(steamDocument);
+				price = getPrice(steamDocument);
+				tags = getTags(steamDocument);
+				imageURL = "http://cdn.akamai.steamstatic.com/steam/apps/" + id + "/header.jpg";
+				iconURL = getIcon(steamDocument);
+			}
+			catch
+			{
+
+			}
 		}
 
 		/*following functions are all searching the html source for
