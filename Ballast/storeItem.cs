@@ -17,6 +17,7 @@ namespace Ballast
 		public string description { get; protected set; }
 		public string imageURL { get; protected set; }
 		public string price { get; protected set; }
+		public string iconURL { get; protected set; }
 		public List<string> tags { get; protected set; }
 
 		//constructor will set all the store item properties
@@ -25,33 +26,34 @@ namespace Ballast
 			HtmlDocument steamDocument = new HtmlWeb().Load("http://store.steampowered.com/app/" + id);
 			appid = id;
 			name = getName(steamDocument);
-			rating = getRating(steamDocument);
 			description = getDescription(steamDocument);
-			imageURL = "http://cdn.akamai.steamstatic.com/steam/apps/" + id + "/header.jpg";
+			rating = getRating(steamDocument);
 			price = getPrice(steamDocument);
 			tags = getTags(steamDocument);
+			imageURL = "http://cdn.akamai.steamstatic.com/steam/apps/" + id + "/header.jpg";
+			iconURL = getIcon(steamDocument);
 		}
 
 		/*following functions are all searching the html source for
 		 elements matching the properties we needs*/
 		private static string getName(HtmlDocument steamDoc)
 		{
-			HtmlNode node = steamDoc.DocumentNode.SelectSingleNode("//div[@class='apphub_AppName']");
-			return node.InnerText;
+			HtmlNode nameNode = steamDoc.DocumentNode.SelectSingleNode("//div[@class='apphub_AppName']");
+			return nameNode.InnerText;
 		}
 
 		private static string getDescription(HtmlDocument steamDoc)
 		{
-			HtmlNode node = steamDoc.DocumentNode.SelectSingleNode("//meta[@property='og:description']");
-			HtmlAttribute descAttribute = node.Attributes["content"];
+			HtmlNode descNode = steamDoc.DocumentNode.SelectSingleNode("//meta[@property='og:description']");
+			HtmlAttribute descAttribute = descNode.Attributes["content"];
 			return descAttribute.Value;
 		}
 
 		private static int getRating(HtmlDocument steamDoc)
 		{
-			HtmlNode node = steamDoc.DocumentNode.SelectSingleNode("//meta[@itemprop='ratingValue']");
-			HtmlAttribute descAttribute = node.Attributes["content"];
-			return Convert.ToInt32(descAttribute.Value);
+			HtmlNode ratingNode = steamDoc.DocumentNode.SelectSingleNode("//meta[@itemprop='ratingValue']");
+			HtmlAttribute ratingAttribute = ratingNode.Attributes["content"];
+			return Convert.ToInt32(ratingAttribute.Value);
 		}
 
 		private static string getPrice(HtmlDocument steamDoc)
@@ -74,6 +76,12 @@ namespace Ballast
 
 			return (gameTags);
 
+		}
+
+		private static string getIcon(HtmlDocument steamDoc)
+		{
+			HtmlNode iconNode = steamDoc.DocumentNode.SelectSingleNode("//div[@class='apphub_AppIcon']//img");
+			return iconNode.Attributes["src"].Value;
 		}
 
 	}
