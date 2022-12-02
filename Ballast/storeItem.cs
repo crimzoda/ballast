@@ -13,10 +13,11 @@ namespace Ballast
 	{
 		public string appid { get; protected set; }
 		public string name { get; protected set; }
-		public int rating { get; protected set; }
 		public string description { get; protected set; }
-		public string imageURL { get; protected set; }
+		public List<string> developers { get; protected set; }
+		public int rating { get; protected set; }
 		public string price { get; protected set; }
+		public string imageURL { get; protected set; }
 		public string iconURL { get; protected set; }
 		public List<string> tags { get; protected set; }
 
@@ -27,6 +28,7 @@ namespace Ballast
 			appid = id;
 			name = getName(steamDocument);
 			description = getDescription(steamDocument);
+			developers = getDevelopers(steamDocument);
 			rating = getRating(steamDocument);
 			price = getPrice(steamDocument);
 			tags = getTags(steamDocument);
@@ -82,6 +84,18 @@ namespace Ballast
 		{
 			HtmlNode iconNode = steamDoc.DocumentNode.SelectSingleNode("//div[@class='apphub_AppIcon']//img");
 			return iconNode.Attributes["src"].Value;
+		}
+		private static List<string> getDevelopers(HtmlDocument steamDoc)
+		{
+			HtmlNodeCollection devNodeCollection = steamDoc.DocumentNode.SelectNodes("//div[@id='developers_list']//a");
+			List<string> devList = new List<string>();
+
+			foreach (var devNode in devNodeCollection)
+			{
+				devList.Add(devNode.InnerText);
+			}
+
+			return devList;
 		}
 
 	}
