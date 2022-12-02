@@ -25,7 +25,7 @@ it would be useful to just have it as property anyway*/
 Console.WriteLine("AppId: " + item.appid);
 Console.WriteLine("Name: " + item.name);
 Console.WriteLine("Description: " + item.description);
-//developers property is a List<string>
+//the developers property in storeItem is a List<string>
 Console.WriteLine("Developers: " + String.Join(',', item.developers.ToArray()));
 Console.WriteLine("Rating: " + item.rating);
 /*right now this returns the final discounted price
