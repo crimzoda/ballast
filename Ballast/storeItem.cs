@@ -19,8 +19,6 @@ namespace Ballast
 		public string price { get; protected set; }
 		public List<string> tags { get; protected set; }
 
-		private static readonly Regex whitespace = new Regex(@"\s+");
-
 		//constructor will set all the store item properties
 		public storeItem(string id)
 		{
@@ -71,7 +69,7 @@ namespace Ballast
 
 			foreach (var gameTagNode in gameTagCollection)
 			{
-				gameTags.Add(whitespace.Replace(gameTagNode.InnerText, String.Empty));
+				gameTags.Add(gameTagNode.InnerText.Trim());
 			}
 
 			return (gameTags);
