@@ -9,6 +9,7 @@ Library functionality:
   - Retrieve price
   - Retrieve tags
   - Retrieve header image
+  - Retrieve icon
   
 Here's an example code snippet:
 ```cs
@@ -28,6 +29,7 @@ Console.WriteLine("Rating: " + item.rating);
 future versions will have both discounted and base price*/
 Console.WriteLine("Price: " + item.price);
 Console.WriteLine(item.imageURL);
+Console.WriteLine(item.iconURL);
 //the tags property in storeItem is a List<string>
 foreach (string tag in item.tags)
 {
