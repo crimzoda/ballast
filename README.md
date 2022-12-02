@@ -25,7 +25,7 @@ it would be useful to just have it as property anyway*/
 Console.WriteLine("AppId: " + item.appid);
 Console.WriteLine("Name: " + item.name);
 Console.WriteLine("Description: " + item.description);
-//the developers property in storeItem is a List<string>
+//the developers property in 'storeItem' is a List<string>
 Console.WriteLine("Developers: " + String.Join(',', item.developers.ToArray()));
 Console.WriteLine("Rating: " + item.rating);
 /*right now this returns the final discounted price
@@ -33,7 +33,7 @@ future versions will have both discounted and base price*/
 Console.WriteLine("Price: " + item.price);
 Console.WriteLine(item.imageURL);
 Console.WriteLine(item.iconURL);
-//the tags property in storeItem is a List<string>
+//the tags property in 'storeItem' is a List<string>
 foreach (string tag in item.tags)
 {
     Console.WriteLine(tag);
