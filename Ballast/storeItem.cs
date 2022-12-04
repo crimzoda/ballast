@@ -9,7 +9,8 @@ using HtmlAgilityPack;
 
 namespace Ballast
 {
-	public class storeItem
+	//this is the class for retrieving online data from steam Store
+	public class StoreItem
 	{
 		/*no need to auto-initialize 'appid' as it will be overwritten
 		by the input regardless of the input being invalid or empty*/
@@ -24,7 +25,7 @@ namespace Ballast
 		public List<string> tags { get; protected set; } = new List<string> { "unknown" };
 
 		//constructor will set all the store item properties
-		public storeItem(string id)
+		public StoreItem(string id)
 		{
 			try
 			{
