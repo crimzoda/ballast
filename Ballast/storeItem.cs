@@ -6,10 +6,15 @@ using System.Threading.Tasks;
 using System.Net;
 using System.Text.RegularExpressions;
 using HtmlAgilityPack;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace Ballast
 {
-	//this is the class for retrieving online data from steam Store
+	/// <summary>
+	/// This class retrieves online data from the Steam store.
+	/// Utilizing a mix of Steam Web API JSON and HTML scraping.
+	/// </summary>
 	public class StoreItem
 	{
 		/*no need to auto-initialize 'appid' as it will be overwritten
@@ -24,88 +29,84 @@ namespace Ballast
 		public string iconURL { get; protected set; } = "unknown";
 		public List<string> tags { get; protected set; } = new List<string> { "unknown" };
 
+
 		//constructor will set all the store item properties
 		public StoreItem(string id)
 		{
-			try
-			{
-				HtmlDocument steamDocument = new HtmlWeb().Load("http://store.steampowered.com/app/" + id);
-				appid = id;
-				name = getName(steamDocument);
-				description = getDescription(steamDocument);
-				developers = getDevelopers(steamDocument);
-				rating = getRating(steamDocument);
-				price = getPrice(steamDocument);
-				tags = getTags(steamDocument);
-				imageURL = "http://cdn.akamai.steamstatic.com/steam/apps/" + id + "/header.jpg";
-				iconURL = getIcon(steamDocument);
-			}
-			catch
-			{
+			appid = id;
+			//Via JSON, Steam Web API will return most of the needed data
+			getAppJSON();
 
+			/* Data that the JSON does not have will be done through scraping.
+			Originally, only JSON was used because Steam sometimes blocked the
+			HTML via an age verification wall. This has been fixed and Ballast 
+			can now bypass it using cookies, however, some games will have more 
+			than one wall. The JSON retrieved through Steam's Web API is more reliable 
+			then the scraping from the store, but there is some data such as 
+			icons and rating that aren't given in the JSON. So scraping will do 
+			the job for the remaining data */
+			var client = new SteamWebClient();
+			HtmlDocument steamDBDoc = client.GetPage($"http://store.steampowered.com/app/{appid}");
+
+			iconURL = getIcon(steamDBDoc);
+			rating = getRating(steamDBDoc);
+		}
+
+		void getAppJSON()
+		{
+			string appDetails = new WebClient().DownloadString($"https://store.steampowered.com/api/appdetails/?appids={appid}");
+			JObject appJSON = JObject.Parse(appDetails);
+
+			//Scanning throug the JSON.
+			if (appJSON[appid]["data"] != null)
+			{
+				///Some Steam apps will not have JSON results (rare),
+				///so exception handling must be done with extra care
+				name = appJSON[appid]["data"]["name"].ToString();
+				description = appJSON[appid]["data"]["short_description"].ToString();
+				developers = JArray.Parse(appJSON[appid]["data"]["developers"].ToString()).ToObject<List<string>>();
+
+				foreach (JObject categoryProperty in appJSON[appid]["data"]["categories"])
+				{
+					tags.Add(categoryProperty["description"].ToString());
+				}
+
+				if (appJSON[appid]["data"]["price_overview"] != null)
+				{
+					price = appJSON[appid]["data"]["price_overview"]["final_formatted"].ToString();
+				}
+				else if ((bool)appJSON[appid]["data"]["is_free"] == true)
+				{
+					price = "free";
+				}
+
+				imageURL = appJSON[appid]["data"]["header_image"].ToString();
 			}
 		}
 
 		/*following functions are all searching the html source for
 		 elements matching the properties we needs*/
-		private static string getName(HtmlDocument steamDoc)
+		private static int getRating(HtmlDocument steamDB)
 		{
-			HtmlNode nameNode = steamDoc.DocumentNode.SelectSingleNode("//div[@class='apphub_AppName']");
-			return nameNode.InnerText;
-		}
-
-		private static string getDescription(HtmlDocument steamDoc)
-		{
-			HtmlNode descNode = steamDoc.DocumentNode.SelectSingleNode("//meta[@property='og:description']");
-			HtmlAttribute descAttribute = descNode.Attributes["content"];
-			return descAttribute.Value;
-		}
-
-		private static int getRating(HtmlDocument steamDoc)
-		{
-			HtmlNode ratingNode = steamDoc.DocumentNode.SelectSingleNode("//meta[@itemprop='ratingValue']");
-			HtmlAttribute ratingAttribute = ratingNode.Attributes["content"];
-			return Convert.ToInt32(ratingAttribute.Value);
-		}
-
-		private static string getPrice(HtmlDocument steamDoc)
-		{
-			HtmlNode priceNode = steamDoc.DocumentNode.SelectSingleNode("//div[@class='discount_final_price']");
-			return (priceNode.InnerText);
-		}
-
-		private static List<string> getTags(HtmlDocument steamDoc)
-		{
-			//compile the app tags into a list
-			HtmlNodeCollection gameTagCollection = steamDoc.DocumentNode.SelectNodes("//a[@class='app_tag']");
-			List<string> gameTags = new List<string>();
-
-
-			foreach (var gameTagNode in gameTagCollection)
+			HtmlNode ratingNode = steamDB.DocumentNode.SelectSingleNode("//meta[@itemprop='ratingValue']");
+			if (ratingNode != null)
 			{
-				gameTags.Add(gameTagNode.InnerText.Trim());
+				HtmlAttribute ratingAttribute = ratingNode.Attributes["content"];
+				return Convert.ToInt32(ratingAttribute.Value);
+			}
+			else
+			{
+				return 0;
 			}
 
-			return (gameTags);
-
 		}
 
-		private static string getIcon(HtmlDocument steamDoc)
+		private static string getIcon(HtmlDocument steamDB)
 		{
-			HtmlNode iconNode = steamDoc.DocumentNode.SelectSingleNode("//div[@class='apphub_AppIcon']//img");
-			return iconNode.Attributes["src"].Value;
-		}
-		private static List<string> getDevelopers(HtmlDocument steamDoc)
-		{
-			HtmlNodeCollection devNodeCollection = steamDoc.DocumentNode.SelectNodes("//div[@id='developers_list']//a");
-			List<string> devList = new List<string>();
+			HtmlNode iconNode = steamDB.DocumentNode.SelectSingleNode("//div[@class='apphub_AppIcon']//img");
+			if (iconNode != null) { return iconNode.Attributes["src"].Value; }
+			else { return "unknown"; }
 
-			foreach (var devNode in devNodeCollection)
-			{
-				devList.Add(devNode.InnerText);
-			}
-
-			return devList;
 		}
 
 	}
