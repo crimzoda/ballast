@@ -25,8 +25,8 @@ namespace Ballast
 		public List<string> developers { get; protected set; } = new List<string> { "unknown" };
 		public int rating { get; protected set; } = 0;
 		public string price { get; protected set; } = "unknown";
-		public string imageURL { get; protected set; } = "unknown";
-		public string iconURL { get; protected set; } = "unknown";
+		public string imageURL { get; protected set; } = "unknown"; //set this to the url of a placeholder '?' image like iconURL
+		public string iconURL { get; protected set; } = "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Bang_icon_32x32.svg/1024px-Bang_icon_32x32.svg.png";
 		public List<string> tags { get; protected set; } = new List<string> { "unknown" };
 
 
@@ -104,8 +104,8 @@ namespace Ballast
 		private static string getIcon(HtmlDocument steamDB)
 		{
 			HtmlNode iconNode = steamDB.DocumentNode.SelectSingleNode("//div[@class='apphub_AppIcon']//img");
-			if (iconNode != null) { return iconNode.Attributes["src"].Value; }
-			else { return "unknown"; }
+			if (iconNode != null) { return iconNode.Attributes["src"].Value.Replace("%CDN_HOST_MEDIA_SSL%", "cdn.akamai.steamstatic.com"); }
+			else { return "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Bang_icon_32x32.svg/1024px-Bang_icon_32x32.svg.png"; }
 
 		}
 
